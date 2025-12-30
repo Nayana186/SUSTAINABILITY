@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Poppins:wght@300;400&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  backdrop-filter: blur(2px);
+}
+
+.title {
+  position: absolute;
+  top: 60px;
+  width: 100%;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 56px;
+  color: #f2e3c6;
+}
+
+.login-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 420px;
+  padding: 30px 40px 40px;
+  background: rgba(140, 160, 110, 0.45);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.login-box h2 {
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+  color: #f7f2e8;
+}
+
+.label {
+  margin-top: 15px;
+  font-size: 18px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+}
+
+button {
+  display: block;
+  margin: 25px auto 0;
+  padding: 10px 40px;
+  border: none;
+  border-radius: 25px;
+  font-size: 18px;
+  background: #0076cc;
+  color: white;
+  cursor: pointer;
+}
+.auth-toggle {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  color:black;                 /* text color */
+  cursor: pointer;
+
+  text-decoration-line: none;
+  
+}
+
+.auth-toggle:hover {
+                  /* text hover color */
+  text-decoration: underline;
+  text-decoration-color:black; /* underline hover color */
+}
+
+
+
