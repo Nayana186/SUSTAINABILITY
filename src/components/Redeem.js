@@ -3,46 +3,77 @@ import { db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { useUser } from "../AuthProvider";
 import { QRCodeCanvas } from "qrcode.react";
+import emailjs from "emailjs-com";
 
 export default function Redeem() {
   const { user } = useUser();
   const [credits, setCredits] = useState(0);
   const [redeemed, setRedeemed] = useState([]);
-  const [availableRewards, setAvailableRewards] = useState([]);
   const [lastRedeemedReward, setLastRedeemedReward] = useState(null);
+  const [emailSent, setEmailSent] = useState(false);
 
-  // Reward catalog
+  /* ================= REWARDS ================= */
+
   const rewardCatalog = useMemo(
     () => [
       { rewardId: "amazon50", name: "₹50 Amazon Voucher", requiredCredits: 10 },
       { rewardId: "gift200", name: "₹200 Gift Card", requiredCredits: 1 },
-      { rewardId: "merch", name: "Exclusive Merchandise", requiredCredits: 50 },
+      { rewardId: "merch", name: "Exclusive Merchandise", requiredCredits: 1 },
     ],
     []
   );
 
-  // Fetch user data
+  /* ================= FETCH USER ================= */
+
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setCredits(data.credits || 0);
-          setRedeemed(data.redeemedRewards || []);
-        }
-        setAvailableRewards(rewardCatalog);
-      } catch (err) {
-        console.error("Failed to fetch user data:", err);
+      if (!user) return;
+
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        setCredits(data.credits || 0);
+        setRedeemed(data.redeemedRewards || []);
       }
     };
-    fetchUser();
-  }, [user, rewardCatalog]);
 
-  // Redeem a reward
+    fetchUser();
+  }, [user]);
+
+  /* ================= EMAIL ================= */
+
+  const sendEmail = (reward, qrValue) => {
+    const templateParams = {
+      email: user.email,                  // MUST match {{email}}
+      rewardName: reward.name,
+      creditsSpent: reward.requiredCredits,
+      qrCode: qrValue,
+    };
+
+    emailjs
+      .send(
+        "service_9xh1upk",      // your service ID
+        "template_mgxpmfd",     // your template ID
+        templateParams,
+        "avg7c4hPcgQ8J5nJ8"     // your public key
+      )
+      .then(() => {
+        setEmailSent(true);
+        setTimeout(() => setEmailSent(false), 4000);
+      })
+      .catch((err) => {
+        console.error("Email error:", err);
+        alert("Email failed. Check EmailJS logs.");
+      });
+  };
+
+  /* ================= REDEEM ================= */
+
   const handleRedeem = async (reward) => {
     if (credits < reward.requiredCredits) {
-      alert("Not enough credits to redeem this reward!");
+      alert("Not enough credits!");
       return;
     }
 
@@ -51,45 +82,78 @@ export default function Redeem() {
       return;
     }
 
-    try {
-      const userRef = doc(db, "users", user.uid);
-      const qrValue = `${user.uid}-${reward.rewardId}-${Date.now()}`;
+    const qrValue = `${user.uid}-${reward.rewardId}-${Date.now()}`;
+    const userRef = doc(db, "users", user.uid);
 
-      await updateDoc(userRef, {
-        redeemedRewards: arrayUnion({ rewardId: reward.rewardId, date: new Date(), qrValue }),
-        credits: credits - reward.requiredCredits,
-      });
+    await updateDoc(userRef, {
+      credits: credits - reward.requiredCredits,
+      redeemedRewards: arrayUnion({
+        rewardId: reward.rewardId,
+        date: new Date(),
+        qrValue,
+      }),
+    });
 
-      setCredits((prev) => prev - reward.requiredCredits);
-      setRedeemed((prev) => [...prev, { rewardId: reward.rewardId, qrValue }]);
-      setLastRedeemedReward({ ...reward, qrValue });
+    setCredits((prev) => prev - reward.requiredCredits);
+    setRedeemed((prev) => [...prev, { rewardId: reward.rewardId, qrValue }]);
+    setLastRedeemedReward({ ...reward, qrValue });
 
-      alert(`🎉 Redeemed: ${reward.name}`);
-    } catch (err) {
-      console.error("Failed to redeem reward:", err);
-      alert("Failed to redeem reward. Try again later.");
-    }
+    sendEmail(reward, qrValue);
+    alert(`🎉 ${reward.name} redeemed!`);
   };
+
+  /* ================= DEMO CREDITS ================= */
+
+  const addDemoCredits = () => {
+    setCredits((prev) => prev + 10);
+    alert("💰 +10 Demo Credits added");
+  };
+
+  /* ================= UI ================= */
 
   return (
     <div style={{ padding: 30, maxWidth: 600 }}>
-      <h1>🎁 Redeem Your Credits</h1>
-      <p>You currently have <strong>{credits}</strong> credits.</p>
+      <h1>🎁 Redeem Credits</h1>
+      <p>
+        Logged in as <strong>{user?.email}</strong>
+      </p>
+      <p>
+        Credits: <strong>{credits}</strong>
+      </p>
+
+      <button
+        onClick={addDemoCredits}
+        style={{
+          marginBottom: 20,
+          padding: "6px 12px",
+          background: "#4CAF50",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer",
+        }}
+      >
+        +10 Demo Credits
+      </button>
 
       <h2>Available Rewards</h2>
+
       <ul>
-        {availableRewards.map((reward) => {
-          const alreadyRedeemed = redeemed.some(r => r.rewardId === reward.rewardId);
+        {rewardCatalog.map((reward) => {
+          const alreadyRedeemed = redeemed.some(
+            (r) => r.rewardId === reward.rewardId
+          );
+
           return (
             <li key={reward.rewardId} style={{ marginBottom: 10 }}>
-              {reward.name} - {reward.requiredCredits} credits
+              {reward.name} — {reward.requiredCredits} credits
               <button
                 onClick={() => handleRedeem(reward)}
-                disabled={credits < reward.requiredCredits || alreadyRedeemed}
+                disabled={alreadyRedeemed || credits < reward.requiredCredits}
                 style={{
                   marginLeft: 10,
                   padding: "4px 8px",
-                  cursor: credits < reward.requiredCredits || alreadyRedeemed ? "not-allowed" : "pointer",
+                  cursor: "pointer",
                 }}
               >
                 {alreadyRedeemed ? "Redeemed" : "Redeem"}
@@ -101,13 +165,21 @@ export default function Redeem() {
 
       {lastRedeemedReward && (
         <div style={{ marginTop: 30, textAlign: "center" }}>
-          <h3>🎉 Redeemed: {lastRedeemedReward.name}</h3>
+          <h3>🎉 {lastRedeemedReward.name}</h3>
+
           <QRCodeCanvas
             value={lastRedeemedReward.qrValue}
             size={150}
             level="H"
           />
-          <p>Scan this QR code to claim your reward!</p>
+
+          <p>Scan to claim reward</p>
+
+          {emailSent && (
+            <p style={{ color: "green", fontWeight: "bold" }}>
+              📧 Email sent to {user.email}
+            </p>
+          )}
         </div>
       )}
     </div>

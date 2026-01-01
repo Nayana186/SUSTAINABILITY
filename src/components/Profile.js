@@ -23,6 +23,7 @@ const CREDIT_THRESHOLD = 1000;
 
 export default function Profile() {
   const { user } = useUser();
+
   const [loading, setLoading] = useState(true);
   const [treeCount, setTreeCount] = useState(0);
   const [verifiedCO2, setVerifiedCO2] = useState(0);
@@ -30,12 +31,23 @@ export default function Profile() {
   const [credits, setCredits] = useState(0);
   const [badges, setBadges] = useState([]);
 
+  /* ================= FETCH USER DATA ================= */
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     const fetchUserData = async () => {
       setLoading(true);
       try {
-        const q = query(collection(db, "trees"), where("userId", "==", user.uid));
+        const q = query(
+          collection(db, "trees"),
+          where("userId", "==", user.uid)
+        );
+
         const snap = await getDocs(q);
+
         let totalVerified = 0;
         let totalRaw = 0;
 
@@ -46,7 +58,10 @@ export default function Profile() {
         });
 
         const creditCount = Math.floor(totalVerified / CREDIT_THRESHOLD);
-        const badgeList = getBadges({ treeCount: snap.size, credits: creditCount });
+        const badgeList = getBadges({
+          treeCount: snap.size,
+          credits: creditCount,
+        });
 
         setTreeCount(snap.size);
         setRawCO2(totalRaw);
@@ -63,8 +78,16 @@ export default function Profile() {
     fetchUserData();
   }, [user]);
 
-  if (loading) return <p>Loading profile...</p>;
+  /* ================= GUARDS ================= */
+  if (!user) {
+    return <p>Please log in to view your profile.</p>;
+  }
 
+  if (loading) {
+    return <p>Loading profile...</p>;
+  }
+
+  /* ================= UI ================= */
   return (
     <div style={{ padding: 30, maxWidth: 600 }}>
       <h1>👤 Your Profile</h1>
@@ -89,17 +112,34 @@ export default function Profile() {
       <h2 style={{ marginTop: 30 }}>🌳 Progress</h2>
       <div>
         <label>CO₂ Contribution Progress (toward next credit)</label>
-        <div style={{ background: "#eee", borderRadius: 6, overflow: "hidden", height: 24, marginTop: 5 }}>
+        <div
+          style={{
+            background: "#eee",
+            borderRadius: 6,
+            overflow: "hidden",
+            height: 24,
+            marginTop: 5,
+          }}
+        >
           <div
             style={{
-              width: `${Math.min((verifiedCO2 / CREDIT_THRESHOLD) * 100, 100)}%`,
+              width: `${Math.min(
+                (verifiedCO2 / CREDIT_THRESHOLD) * 100,
+                100
+              )}%`,
               background: "#4caf50",
               height: "100%",
               transition: "width 0.3s",
             }}
           />
         </div>
-        <p>{Math.min((verifiedCO2 / CREDIT_THRESHOLD) * 100, 100).toFixed(0)}% of next credit</p>
+        <p>
+          {Math.min(
+            (verifiedCO2 / CREDIT_THRESHOLD) * 100,
+            100
+          ).toFixed(0)}
+          % of next credit
+        </p>
       </div>
     </div>
   );

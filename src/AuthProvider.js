@@ -1,6 +1,8 @@
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebase";
 import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { db } from "./firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -9,12 +11,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      console.log("Firebase user:", u);
-      setUser(u);
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
       setLoading(false);
+
+      if (firebaseUser) {
+        const userRef = doc(db, "users", firebaseUser.uid);
+        const snap = await getDoc(userRef);
+
+        if (!snap.exists()) {
+          await setDoc(userRef, {
+            email: firebaseUser.email,
+            credits: 10,          // demo credits
+            redeemedRewards: [],
+            createdAt: new Date(),
+          });
+
+          console.log("✅ users collection recreated");
+        }
+      }
     });
-    return unsubscribe;
+
+    return () => unsub();
   }, []);
 
   return (
