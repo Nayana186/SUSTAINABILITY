@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { AuthProvider } from "./AuthProvider";
 
+import Home from "./components/Home";
 import AddTree from "./components/AddTree";
 import TreeList from "./components/TreeList";
 import Leaderboard from "./components/Leaderboard";
@@ -19,6 +20,8 @@ import GamesHome from "./games/GamesHome";
 import EcoQuiz from "./games/EcoQuiz/EcoQuiz";
 import CarbonGuesser from "./games/CarbonGuesser/CarbonGuesser";
 import PlantTicTacToe from "./games/Tic-Tac-Toe/TicTacToe";
+import TreesPage from "./components/TreesPage"; // make sure the path is correct
+
 
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
@@ -41,9 +44,9 @@ function Dashboard() {
         position: "relative",
       }}
     >
-      <h1 style={{ textAlign: "center" }}>🌿 CQuester Prototype</h1>
+      <h1 style={{ textAlign: "center" }}>🌿 CQuestER Dashboard</h1>
 
-      {/* Logout Button */}
+      {/* Logout */}
       <button
         onClick={handleLogout}
         style={{
@@ -61,65 +64,18 @@ function Dashboard() {
         Logout
       </button>
 
-      {/* Navigation Buttons */}
-      <button
-        onClick={() => navigate("/leaderboard")}
-        style={{ position: "absolute", top: 20, left: 20 }}
-      >
-        🏆 Leaderboard
-      </button>
+      {/* NAVIGATION */}
+      <div style={{ position: "absolute", top: 20, left: 20 }}>
+        <button onClick={() => navigate("/")}>🏠 Home</button><br />
+        <button onClick={() => navigate("/leaderboard")}>🏆 Leaderboard</button><br />
+        <button onClick={() => navigate("/growth-gallery")}>🌿 Growth Gallery</button><br />
+        <button onClick={() => navigate("/profile")}>👤 Profile</button><br />
+        <button onClick={() => navigate("/redeem")}>🎁 Redeem</button><br />
+        <button onClick={() => navigate("/games")}>🎮 Mini Games</button>
+      </div>
 
-      <button
-        onClick={() => navigate("/growth-gallery")}
-        style={{ position: "absolute", top: 60, left: 20 }}
-      >
-        🌿 Growth Gallery
-      </button>
-
-      <button
-        onClick={() => navigate("/profile")}
-        style={{ position: "absolute", top: 100, left: 20 }}
-      >
-        👤 Profile
-      </button>
-
-      <button
-        onClick={() => navigate("/redeem")}
-        style={{ position: "absolute", top: 140, left: 20 }}
-      >
-        🎁 Redeem
-      </button>
-
-      <button
-        onClick={() => navigate("/games")}
-        style={{ position: "absolute", top: 180, left: 20 }}
-      >
-        🎮 Mini Games
-      </button>
-
-      <button
-        onClick={() => navigate("/games/quiz")}
-        style={{ position: "absolute", top: 220, left: 20 }}
-      >
-        🧠 Eco Quiz
-      </button>
-
-      <button
-        onClick={() => navigate("/games/carbon-guesser")}
-        style={{ position: "absolute", top: 260, left: 20 }}
-      >
-        🌍 Carbon Guesser
-      </button>
-
-      <button
-        onClick={() => navigate("/games/tic-tac-toe")}
-        style={{ position: "absolute", top: 300, left: 20 }}
-      >
-        🌱 Plant Tic-Tac-Toe
-      </button>
-
-      {/* Main Content */}
-      <div style={{ display: "flex", gap: 40, marginTop: 60 }}>
+      {/* MAIN CONTENT */}
+      <div style={{ display: "flex", gap: 40, marginTop: 80 }}>
         <div style={{ flex: 1 }}>
           <AddTree />
         </div>
@@ -138,15 +94,23 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Core Pages */}
-          <Route path="/" element={<Dashboard />} />
+          {/* PUBLIC */}
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<AuthPage />} />
+
+          {/* DASHBOARD */}
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* FEATURES */}
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/growth-gallery" element={<GrowthGallery />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/redeem" element={<Redeem />} />
+          <Route path="/trees" element={<TreesPage />} />
 
-          {/* Games */}
+
+
+          {/* GAMES */}
           <Route path="/games" element={<GamesHome />} />
           <Route path="/games/quiz" element={<EcoQuiz />} />
           <Route path="/games/carbon-guesser" element={<CarbonGuesser />} />

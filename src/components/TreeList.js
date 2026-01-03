@@ -6,23 +6,15 @@ import {
   where,
   doc,
   deleteDoc,
-  updateDoc,
-  arrayUnion,
-  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../AuthProvider";
-
-/* ================= CONFIG ================= */
-
-const GROWTH_BONUS_CO2 = 50; // kg CO₂ per growth image
 
 /* ================= COMPONENT ================= */
 
 export default function TreeList() {
   const { user } = useUser();
   const [trees, setTrees] = useState([]);
-  const [uploadingTreeId, setUploadingTreeId] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -44,55 +36,7 @@ export default function TreeList() {
     return () => unsub();
   }, [user]);
 
-  /* ================= CLOUDINARY ================= */
-
-  const uploadToCloudinary = async (file) => {
-    const url = "https://api.cloudinary.com/v1_1/dhl70c7m2/upload";
-    const preset = "vuddza3n";
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", preset);
-
-    const res = await fetch(url, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    return data.secure_url;
-  };
-
-  /* ================= GROWTH UPLOAD ================= */
-
-  const handleGrowthUpload = async (treeId, file) => {
-    if (!file) return;
-
-    try {
-      setUploadingTreeId(treeId);
-
-      const imageUrl = await uploadToCloudinary(file);
-
-      const treeRef = doc(db, "trees", treeId);
-
-      await updateDoc(treeRef, {
-        growthUpdates: arrayUnion({
-          imageUrl,
-          uploadedAt: serverTimestamp(),
-          bonusCO2: GROWTH_BONUS_CO2,
-        }),
-        totalCO2TillNow:
-          (trees.find((t) => t.id === treeId)?.totalCO2TillNow || 0) +
-          GROWTH_BONUS_CO2,
-      });
-    } catch (err) {
-      console.error("Growth upload error:", err);
-    } finally {
-      setUploadingTreeId(null);
-    }
-  };
-
-  /* ================= DELETE ================= */
+  /* ================= DELETE TREE ================= */
 
   const handleDelete = async (id) => {
     await deleteDoc(doc(db, "trees", id));
@@ -163,27 +107,10 @@ export default function TreeList() {
             </div>
           </div>
 
-          {/* 🌱 GROWTH UPLOAD */}
-          <div style={{ marginTop: 12 }}>
-            <label>
-              📤 Upload growth photo:
-              <input
-                type="file"
-                accept="image/*"
-                disabled={uploadingTreeId === t.id}
-                onChange={(e) =>
-                  handleGrowthUpload(t.id, e.target.files[0])
-                }
-              />
-            </label>
-          </div>
-
-          {/* 🌿 GROWTH GALLERY */}
+          {/* 🌿 GROWTH GALLERY (READ ONLY) */}
           {t.growthUpdates && t.growthUpdates.length > 0 && (
-            <div style={{ marginTop: 10 }}>
-              <p style={{ fontSize: 13 }}>
-                Growth updates (+{GROWTH_BONUS_CO2} kg each)
-              </p>
+            <div style={{ marginTop: 12 }}>
+              <p style={{ fontSize: 13 }}>Growth updates</p>
 
               <div style={{ display: "flex", gap: 8 }}>
                 {t.growthUpdates.map((g, i) => (

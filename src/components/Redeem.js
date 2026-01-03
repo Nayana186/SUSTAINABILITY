@@ -5,6 +5,9 @@ import { useUser } from "../AuthProvider";
 import { QRCodeCanvas } from "qrcode.react";
 import emailjs from "emailjs-com";
 
+/* ================= ADMIN CONFIG ================= */
+const ADMIN_EMAILS = ["b24ee046@gmail.com"]; // 🔐 change this
+
 export default function Redeem() {
   const { user } = useUser();
   const [credits, setCredits] = useState(0);
@@ -13,7 +16,6 @@ export default function Redeem() {
   const [emailSent, setEmailSent] = useState(false);
 
   /* ================= REWARDS ================= */
-
   const rewardCatalog = useMemo(
     () => [
       { rewardId: "amazon50", name: "₹50 Amazon Voucher", requiredCredits: 10 },
@@ -24,7 +26,6 @@ export default function Redeem() {
   );
 
   /* ================= FETCH USER ================= */
-
   useEffect(() => {
     const fetchUser = async () => {
       if (!user) return;
@@ -43,10 +44,9 @@ export default function Redeem() {
   }, [user]);
 
   /* ================= EMAIL ================= */
-
   const sendEmail = (reward, qrValue) => {
     const templateParams = {
-      email: user.email,                  // MUST match {{email}}
+      email: user.email,
       rewardName: reward.name,
       creditsSpent: reward.requiredCredits,
       qrCode: qrValue,
@@ -54,10 +54,10 @@ export default function Redeem() {
 
     emailjs
       .send(
-        "service_9xh1upk",      // your service ID
-        "template_mgxpmfd",     // your template ID
+        "service_9xh1upk",
+        "template_mgxpmfd",
         templateParams,
-        "avg7c4hPcgQ8J5nJ8"     // your public key
+        "avg7c4hPcgQ8J5nJ8"
       )
       .then(() => {
         setEmailSent(true);
@@ -70,7 +70,6 @@ export default function Redeem() {
   };
 
   /* ================= REDEEM ================= */
-
   const handleRedeem = async (reward) => {
     if (credits < reward.requiredCredits) {
       alert("Not enough credits!");
@@ -102,39 +101,43 @@ export default function Redeem() {
     alert(`🎉 ${reward.name} redeemed!`);
   };
 
-  /* ================= DEMO CREDITS ================= */
-
+  /* ================= DEMO CREDITS (ADMIN ONLY) ================= */
   const addDemoCredits = () => {
     setCredits((prev) => prev + 10);
     alert("💰 +10 Demo Credits added");
   };
 
-  /* ================= UI ================= */
+  const isAdmin = ADMIN_EMAILS.includes(user?.email);
 
+  /* ================= UI ================= */
   return (
     <div style={{ padding: 30, maxWidth: 600 }}>
       <h1>🎁 Redeem Credits</h1>
+
       <p>
         Logged in as <strong>{user?.email}</strong>
       </p>
+
       <p>
         Credits: <strong>{credits}</strong>
       </p>
 
-      <button
-        onClick={addDemoCredits}
-        style={{
-          marginBottom: 20,
-          padding: "6px 12px",
-          background: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: 4,
-          cursor: "pointer",
-        }}
-      >
-        +10 Demo Credits
-      </button>
+      {isAdmin && (
+        <button
+          onClick={addDemoCredits}
+          style={{
+            marginBottom: 20,
+            padding: "6px 12px",
+            background: "#4CAF50",
+            color: "white",
+            border: "none",
+            borderRadius: 4,
+            cursor: "pointer",
+          }}
+        >
+          +10 Demo Credits (Admin)
+        </button>
+      )}
 
       <h2>Available Rewards</h2>
 

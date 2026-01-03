@@ -6,13 +6,11 @@ import {
   where,
   doc,
   updateDoc,
-  arrayUnion,
-  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../AuthProvider";
 
-const GROWTH_BONUS_CO2 = 50; // kg CO₂ per growth image
+const GROWTH_BONUS_CO2 = 50;
 
 export default function GrowthGallery() {
   const { user } = useUser();
@@ -20,201 +18,206 @@ export default function GrowthGallery() {
   const [uploadingTreeId, setUploadingTreeId] = useState(null);
   const [expandedTrees, setExpandedTrees] = useState({});
 
+  /* ================= FETCH TREES ================= */
   useEffect(() => {
     if (!user) return;
 
-    const q = query(collection(db, "trees"), where("userId", "==", user.uid));
+    const q = query(
+      collection(db, "trees"),
+      where("userId", "==", user.uid)
+    );
 
     const unsub = onSnapshot(q, (snapshot) => {
-      const fetchedTrees = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const fetched = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
       }));
 
-      const processedTrees = fetchedTrees.map((tree) => ({
-        ...tree,
-        growthUpdates: (tree.growthUpdates || []).sort((a, b) => {
-          const tA = a.uploadedAt?.toMillis?.() || a.tempTimestamp || 0;
-          const tB = b.uploadedAt?.toMillis?.() || b.tempTimestamp || 0;
-          return tA - tB;
-        }),
-      }));
+      fetched.forEach((t) => {
+        t.growthUpdates = (t.growthUpdates || []).sort(
+          (a, b) => (a.uploadedAt || 0) - (b.uploadedAt || 0)
+        );
+      });
 
-      setTrees(processedTrees);
+      setTrees(fetched);
     });
 
     return () => unsub();
   }, [user]);
 
-  if (!user) return <p>Loading user...</p>;
+  if (!user) return <p>Loading...</p>;
 
+  /* ================= CLOUDINARY UPLOAD ================= */
   const uploadToCloudinary = async (file) => {
     const url = "https://api.cloudinary.com/v1_1/dhl70c7m2/upload";
     const preset = "vuddza3n";
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", preset);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("upload_preset", preset);
 
-    const res = await fetch(url, { method: "POST", body: formData });
+    const res = await fetch(url, { method: "POST", body: fd });
     const data = await res.json();
-    return data.secure_url;
+
+    return {
+      secure_url: data.secure_url,
+      public_id: data.public_id,
+    };
   };
 
+  /* ================= UPLOAD ================= */
   const handleGrowthUpload = async (treeId, file) => {
     if (!file) return;
 
     try {
       setUploadingTreeId(treeId);
 
-      // 1️⃣ Upload to Cloudinary
-      const imageUrl = await uploadToCloudinary(file);
-      console.log("Uploaded Image URL:", imageUrl);
+      const { secure_url, public_id } = await uploadToCloudinary(file);
+      const timestamp = Date.now();
 
-      // 2️⃣ Prepare a temporary growth update for optimistic rendering
-      const tempUpdate = {
-        tempTimestamp: Date.now(),
-        imageUrl,
+      const newUpdate = {
+        imageUrl: secure_url,
+        publicId: public_id,
         bonusCO2: GROWTH_BONUS_CO2,
-        uploadedAt: { toMillis: () => Date.now() },
+        uploadedAt: timestamp,
       };
 
-      // 3️⃣ Optimistic local update
       setTrees((prev) =>
         prev.map((t) =>
           t.id === treeId
             ? {
                 ...t,
-                growthUpdates: [...(t.growthUpdates || []), tempUpdate],
-                totalCO2TillNow: (t.totalCO2TillNow || 0) + GROWTH_BONUS_CO2,
+                growthUpdates: [...(t.growthUpdates || []), newUpdate],
+                totalCO2TillNow:
+                  (t.totalCO2TillNow || 0) + GROWTH_BONUS_CO2,
               }
             : t
         )
       );
 
-      // 4️⃣ Update Firestore
-      const treeRef = doc(db, "trees", treeId);
-      await updateDoc(treeRef, {
-        growthUpdates: arrayUnion({
-          imageUrl,
-          bonusCO2: GROWTH_BONUS_CO2,
-          uploadedAt: serverTimestamp(),
-        }),
+      await updateDoc(doc(db, "trees", treeId), {
+        growthUpdates: [
+          ...(trees.find((t) => t.id === treeId)?.growthUpdates || []),
+          newUpdate,
+        ],
         totalCO2TillNow:
           (trees.find((t) => t.id === treeId)?.totalCO2TillNow || 0) +
           GROWTH_BONUS_CO2,
       });
-    } catch (err) {
-      console.error("Growth upload error:", err);
     } finally {
       setUploadingTreeId(null);
     }
   };
 
-  const toggleTreeExpansion = (treeId) => {
-    setExpandedTrees((prev) => ({
-      ...prev,
-      [treeId]: !prev[treeId],
-    }));
-  };
+  /* ================= DELETE ================= */
+const handleDeleteGrowth = async (treeId, growth) => {
+  if (!window.confirm("Delete this growth image?")) return;
+
+  try {
+    const tree = trees.find((t) => t.id === treeId);
+    if (!tree) return;
+
+    const updatedGrowth = tree.growthUpdates.filter(
+      (g) => g.uploadedAt !== growth.uploadedAt
+    );
+
+    await updateDoc(doc(db, "trees", treeId), {
+      growthUpdates: updatedGrowth,
+      totalCO2TillNow:
+        Math.max(
+          (tree.totalCO2TillNow || 0) - (growth.bonusCO2 || 0),
+          0
+        ),
+    });
+  } catch (err) {
+    console.error("Delete failed:", err);
+  }
+};
+
 
   return (
     <div style={{ maxWidth: 900, padding: 20 }}>
       <h1>🌿 Growth Gallery</h1>
-      <p style={{ color: "#555" }}>Upload and view growth updates per tree</p>
-
-      {trees.length === 0 && <p>No trees added yet.</p>}
 
       {trees.map((tree) => {
-        const isExpanded = expandedTrees[tree.id] || false;
+        const expanded = expandedTrees[tree.id];
 
         return (
           <div
             key={tree.id}
             style={{
               marginTop: 20,
-              padding: 20,
               border: "1px solid #ddd",
-              borderRadius: 12,
+              padding: 16,
+              borderRadius: 10,
             }}
           >
-            {/* TREE HEADER */}
-            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-              {tree.imageUrl && (
-                <img
-                  src={tree.imageUrl}
-                  alt={tree.species}
-                  width={100}
-                  height={100}
-                  style={{ objectFit: "cover", borderRadius: 10 }}
-                />
-              )}
+            <div style={{ display: "flex", gap: 16 }}>
+              <img
+                src={tree.imageUrl}
+                alt={`${tree.species} tree`}
+                width={100}
+                height={100}
+                style={{ borderRadius: 8 }}
+              />
 
               <div>
                 <h3>{tree.species}</h3>
-                <p>Age: {tree.age} yrs</p>
-                <p>
-                  Total CO₂: <b>{tree.totalCO2TillNow || 0} kg</b>
-                </p>
+                <p>Total CO₂: {tree.totalCO2TillNow || 0} kg</p>
               </div>
 
               <button
-                onClick={() => toggleTreeExpansion(tree.id)}
-                style={{ marginLeft: "auto", padding: "6px 12px", cursor: "pointer" }}
+                onClick={() =>
+                  setExpandedTrees((p) => ({
+                    ...p,
+                    [tree.id]: !p[tree.id],
+                  }))
+                }
+                style={{ marginLeft: "auto" }}
               >
-                {isExpanded ? "Hide Growth" : "Show Growth"}
+                {expanded ? "Hide" : "Show"}
               </button>
             </div>
 
-            {/* GROWTH SECTION */}
-            {isExpanded && (
-              <div style={{ marginTop: 16 }}>
-                <label>
-                  📤 Upload growth photo:
-                  <input
-                    type="file"
-                    accept="image/*"
-                    disabled={uploadingTreeId === tree.id}
-                    onChange={(e) =>
-                      handleGrowthUpload(tree.id, e.target.files[0])
-                    }
-                  />
-                </label>
+            {expanded && (
+              <>
+                <input
+                  type="file"
+                  accept="image/*"
+                  disabled={uploadingTreeId === tree.id}
+                  onChange={(e) =>
+                    handleGrowthUpload(tree.id, e.target.files[0])
+                  }
+                />
 
-                {tree.growthUpdates && tree.growthUpdates.length > 0 ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 12,
-                      flexWrap: "wrap",
-                      marginTop: 12,
-                    }}
-                  >
-                    {tree.growthUpdates
-                      .sort((a, b) => {
-                        const tA = a.uploadedAt?.toMillis?.() || a.tempTimestamp || 0;
-                        const tB = b.uploadedAt?.toMillis?.() || b.tempTimestamp || 0;
-                        return tA - tB;
-                      })
-                      .map((g, i) => (
-                        <div key={i} style={{ textAlign: "center" }}>
-                          <img
-                            src={g.imageUrl}
-                            alt="Growth"
-                            width={120}
-                            height={120}
-                            style={{ objectFit: "cover", borderRadius: 10 }}
-                          />
-                          <p style={{ fontSize: 12, marginTop: 4 }}>
-                            +{g.bonusCO2} kg CO₂
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <p style={{ color: "#777", marginTop: 12 }}>No growth updates yet.</p>
-                )}
-              </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    flexWrap: "wrap",
+                    marginTop: 12,
+                  }}
+                >
+                  {tree.growthUpdates?.map((g, i) => (
+                    <div key={i} style={{ textAlign: "center" }}>
+                      <img
+                        src={g.imageUrl}
+                        alt={`Growth update for ${tree.species}`}
+                        width={120}
+                        height={120}
+                        style={{ borderRadius: 8 }}
+                      />
+                      <p>+{g.bonusCO2} kg</p>
+                      <button
+                        style={{ color: "red", fontSize: 12 }}
+                        onClick={() => handleDeleteGrowth(tree.id, g)}
+                      >
+                        🗑 Delete
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         );
