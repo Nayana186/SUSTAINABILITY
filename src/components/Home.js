@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./home.css";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -11,17 +12,10 @@ export default function Home() {
 
   return (
     <div
-      className="home-container"
-      style={{
-        backgroundColor: "#e8f5e9", // light green background instead of image
-        width: "100%",
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "40px 20px",
-      }}
-    >
+  className="home-container"
+  style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/forest.jpg)` }}
+>
+
       {/* ================= NAVBAR ================= */}
       <div className="home-navbar">
         <div className="home-logo">CQ</div>

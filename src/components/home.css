@@ -1,0 +1,108 @@
+/* ================= GLOBAL ================= */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Patrick+Hand&display=swap");
+
+.home-container {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+/* ================= NAVBAR ================= */
+.home-navbar {
+  width: 100%;
+  height: 90px;
+  background-color: #2e461f;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+/* LOGO */
+.home-logo {
+  width: 70px;
+  height: 70px;
+  background-color: #ffffff;
+  color: #2e461f;
+  border-radius: 50%;
+  font-family: "Cinzel", serif;
+  font-size: 28px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* NAV LINKS (RIGHT SIDE PANEL STYLE) */
+.home-nav-links {
+  position: absolute;
+  top: 120px;
+  right: 40px;
+  width: 220px;
+  padding: 30px 20px;
+  background: rgba(200, 220, 170, 0.35);
+  backdrop-filter: blur(6px);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* BUTTON STYLE LINKS */
+.nav-link {
+  background-color: #ffffff;
+  color: #2e461f;
+  text-decoration: none;
+  text-align: center;
+  padding: 10px 0;
+  border-radius: 18px;
+  font-family: "Cinzel", serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #2e461f;
+  color: #ffffff;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+  margin-top: 10px;
+  background-color: #b00000;
+  color: #ffffff;
+  border: none;
+  padding: 10px 0;
+  border-radius: 18px;
+  font-family: "Cinzel", serif;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #8b0000;
+}
+
+/* ================= ABOUT SECTION ================= */
+.home-about {
+  max-width: 650px;
+  margin-top: 140px;
+  margin-left: 60px;
+  font-family: "Patrick Hand", cursive;
+  line-height: 1.8;
+}
+
+.home-about h2 {
+  font-family: "Cinzel", serif;
+  font-size: 40px;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.home-about p {
+  font-size: 18px;
+  max-width: 580px;
+}
