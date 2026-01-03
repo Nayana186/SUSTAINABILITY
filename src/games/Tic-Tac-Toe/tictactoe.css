@@ -1,0 +1,78 @@
+/* ===== PAGE CONTAINER ===== */
+.ttt-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* ===== TITLE ===== */
+.ttt-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+}
+
+/* ===== TURN / RESULT TEXT ===== */
+.ttt-container h3 {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ===== BOARD GRID ===== */
+.ttt-board {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 6px;
+  justify-content: center;
+  margin: 1rem auto;
+}
+
+/* ===== CELL BUTTON ===== */
+.ttt-cell {
+  width: 60px;
+  height: 60px;
+  font-size: 2rem;
+  border-radius: 8px;
+  border: 2px solid #4caf50;
+  background-color: #f0fff0;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.ttt-cell:hover {
+  transform: scale(1.05);
+  background-color: #e8f5e9;
+}
+
+.ttt-cell:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== RESET BUTTON ===== */
+.ttt-reset {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: #ffffff;
+  border: none;
+  margin-top: 10px;
+}
+
+.ttt-reset:hover {
+  background-color: #43a047;
+}
+
+.ttt-card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+

@@ -5,7 +5,7 @@ import { db } from "../../firebase";
 import { useUser } from "../../AuthProvider";
 
 import { doc, updateDoc, increment } from "firebase/firestore";
-
+import "./carbonguesser.css";
 
 
 const REWARD_THRESHOLD = 20; // % error allowed

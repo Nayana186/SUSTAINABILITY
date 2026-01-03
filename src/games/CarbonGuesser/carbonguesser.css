@@ -1,0 +1,128 @@
+/* ====== PAGE WRAPPER ====== */
+.carbon-game {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #02430a, #539e7d, #024909);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: #ffffff;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+/* ====== GAME TITLE ====== */
+.carbon-game h1 {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* ====== REWARD / PROGRESS BOX ====== */
+.reward-box {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.reward-box span {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* ====== PROGRESS BAR ====== */
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00e676, #1de9b6);
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+/* ====== ACTIVITY TEXT ====== */
+.carbon-game h3 {
+  font-size: 1.3rem;
+  margin: 18px 0 14px;
+  text-align: center;
+  max-width: 480px;
+}
+
+/* ====== INPUT FIELD ====== */
+.carbon-game input {
+  width: 100%;
+  max-width: 360px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+/* ====== BUTTONS ====== */
+.carbon-game button {
+  width: 100%;
+  max-width: 360px;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #00c853, #64dd17);
+  color: #083d1a;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carbon-game button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* ====== ANSWER TEXT ====== */
+.carbon-game p {
+  font-size: 1rem;
+  margin: 6px 0;
+  opacity: 0.95;
+}
+
+/* ====== GAME COMPLETE SCREEN ====== */
+.carbon-complete {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+.carbon-complete h1 {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.carbon-complete h2 {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+}
+
+.carbon-complete p {
+  font-size: 1.1rem;
+}

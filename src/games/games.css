@@ -1,123 +1,125 @@
-/* ================= RESET ================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* ================= PAGE ================= */
+/* Page background */
 .games-home {
   min-height: 100vh;
-  padding: 120px 40px 60px;
+  padding: 2rem;
   text-align: center;
 
-  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: #ffffff;
-
-  background: linear-gradient(
-      rgba(12, 35, 12, 0.78),
-      rgba(12, 35, 12, 0.78)
-    ),
-    url("/forest.jpeg") center / cover no-repeat;
+  font-family: "Georgia", serif;
 }
 
-/* ================= TITLE ================= */
+/* Page heading */
 .games-home h1 {
-  font-size: 32px;
+  font-size: 2.4rem;
   letter-spacing: 2px;
-  margin-bottom: 12px;
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
-
-  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
 }
 
+/* Hide subtitle (not in design) */
 .games-subtitle {
-  font-size: 16px;
-  color: #d9ffd9;
-  margin-bottom: 40px;
+  display: none;
 }
 
-/* ================= GRID ================= */
+/* Grid layout */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 28px;
-  max-width: 1100px;
-  margin: 0 auto;
+  gap: 30px;
+  margin-top: 2.5rem;
 }
 
-/* ================= GAME CARD ================= */
+/* Game card */
 .game-card {
-  position: relative;
-  padding: 32px 26px;
-
-  background: rgba(22, 55, 22, 0.78);
-  backdrop-filter: blur(6px);
-
-  border: 3px solid #7ed957;
-  border-radius: 22px;
-
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.55);
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background-color: rgba(45, 68, 25, 0.95);
+  border: 3px solid #a8e063;
+  border-radius: 10px;
+  padding: 1.8rem 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
-.game-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.7);
-}
-
-/* ================= CARD CONTENT ================= */
+/* Card title */
 .game-card h2 {
-  font-size: 20px;
-  margin-bottom: 12px;
-  color: #eaffea;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  color: #ffffff;
 }
 
+/* Card text */
 .game-card p {
-  font-size: 14.5px;
-  line-height: 1.5;
-  color: #d6ffd6;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+  color: #e5e5e5;
+  text-transform: uppercase;
 }
 
-/* ================= PLAY BUTTON ================= */
+/* Play button */
 .play-btn {
   display: inline-block;
-  margin-top: 18px;
-  padding: 10px 26px;
-
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-
-  color: #173d17;
-  background: linear-gradient(145deg, #b7ff8a, #7ed957);
-
-  border-radius: 30px;
+  padding: 0.45rem 1.6rem;
+  background-color: #0b72c9;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
   text-decoration: none;
-
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .play-btn:hover {
+  background-color: #095fa8;
   transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
-  .games-home {
-    padding: 100px 20px 40px;
-  }
+/* HEADER BAR */
+.games-header {
+  height: 70px;
+  background-color: #2e4b1c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
 
-  .games-home h1 {
-    font-size: 26px;
-  }
+/* Logo container */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-  .game-card {
-    padding: 26px 20px;
-  }
+/* CQ Circle Logo */
+.cq-logo {
+  width: 48px;
+  height: 48px;
+  background-color: #ffffff;
+  color: #2e4b1c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  font-family: "Georgia", serif;
+}
+
+/* Site name */
+.site-name {
+  font-size: 1.6rem;
+  color: #ffffff;
+  font-family: "Georgia", serif;
+  letter-spacing: 2px;
+}
+
+/* Menu icon */
+.menu-icon {
+  font-size: 1.8rem;
+  color: #ffffff;
+  cursor: pointer;
 }
