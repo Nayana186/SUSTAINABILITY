@@ -11,12 +11,34 @@ import {
 import { useUser } from "../AuthProvider";
 
 /* ================= CONFIG ================= */
-
 const DAILY_LIMIT = 3;
 const DEMO_EMAIL = "b24ee046@gmail.com"; // unlimited access
 
-/* ================= COMPONENT ================= */
+/* Manual fallback mapping for scientific → common names */
+const speciesMap = {
+  "Azadirachta indica": "Neem",
+  "Mangifera indica": "Mango",
+  "Tectona grandis": "Teak",
+  "Bambusa vulgaris": "Bamboo",
+};
 
+/* CO₂ per species */
+const speciesCO2 = {
+  Neem: 22,
+  Mango: 30,
+  Teak: 50,
+  Bamboo: 12,
+};
+
+/* Age ranges */
+const ageRangeMap = {
+  seedling: 1,
+  young: 3,
+  mature: 8,
+  old: 12,
+};
+
+/* ================= COMPONENT ================= */
 export default function AddTree() {
   const { user } = useUser();
 
@@ -33,24 +55,7 @@ export default function AddTree() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  /* ================= CO₂ DATA ================= */
-
-  const speciesCO2 = {
-    Neem: 22,
-    Mango: 30,
-    Teak: 50,
-    Bamboo: 12,
-  };
-
-  const ageRangeMap = {
-    seedling: 1,
-    young: 3,
-    mature: 8,
-    old: 12,
-  };
-
   /* ================= LOCATION ================= */
-
   const captureLocation = () => {
     if (!navigator.geolocation) {
       setMessage("Geolocation not supported");
@@ -70,7 +75,6 @@ export default function AddTree() {
   };
 
   /* ================= CLOUDINARY ================= */
-
   const uploadImageToCloudinary = async (file) => {
     const url = "https://api.cloudinary.com/v1_1/dhl70c7m2/upload";
     const preset = "vuddza3n";
@@ -89,7 +93,6 @@ export default function AddTree() {
   };
 
   /* ================= PLANTNET ================= */
-
   const identifyPlant = async (file) => {
     const formData = new FormData();
     formData.append("organs", organ);
@@ -104,31 +107,34 @@ export default function AddTree() {
       const data = await response.json();
 
       if (data?.results?.length > 0) {
-        const options = data.results.map(
-          (r) => r.species.scientificName
-        );
+        // Map API results to {scientific, common, imageUrl}
+        const options = data.results.map((r) => ({
+          scientific: r.species.scientificName,
+          common:
+            r.species.commonNames?.[0] ||
+            speciesMap[r.species.scientificName] ||
+            r.species.scientificName,
+          imageUrl: r.species.defaultImage?.url || null,
+        }));
+
         setSpeciesOptions(options);
-        return options[0];
+
+        // Return first option scientific name for saving
+        return options[0].scientific;
       }
 
-      return "Unknown";
+      return null;
     } catch (err) {
       console.error("PlantNet error:", err);
-      return "Unknown";
+      return null;
     }
   };
 
-  /* ================= DAILY LIMIT (SAFE LOGIC) ================= */
-
+  /* ================= DAILY LIMIT ================= */
   const checkDailyLimit = async () => {
-    // Unlimited user
     if (user.email === DEMO_EMAIL) return true;
 
-    const q = query(
-      collection(db, "trees"),
-      where("userId", "==", user.uid)
-    );
-
+    const q = query(collection(db, "trees"), where("userId", "==", user.uid));
     const snap = await getDocs(q);
 
     const today = new Date();
@@ -137,7 +143,6 @@ export default function AddTree() {
     const todayCount = snap.docs.filter((doc) => {
       const createdAt = doc.data().createdAt?.toDate?.();
       if (!createdAt) return false;
-
       return createdAt >= today;
     }).length;
 
@@ -145,7 +150,6 @@ export default function AddTree() {
   };
 
   /* ================= IMAGE HANDLER ================= */
-
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -154,21 +158,23 @@ export default function AddTree() {
     setLoading(true);
     setMessage("Identifying plant species...");
 
-    const guessed = await identifyPlant(file);
+    const guessedScientific = await identifyPlant(file);
 
-    if (guessed === "Unknown") {
+    if (!guessedScientific) {
       setSpecies("");
-      setMessage("Could not identify species. Select manually.");
+      setMessage("Could not identify species. You can type it manually.");
     } else {
-      setSpecies(guessed);
-      setMessage(`Detected: ${guessed}`);
+      const matched = speciesOptions.find(
+        (s) => s.scientific === guessedScientific
+      );
+      setSpecies(matched?.common || guessedScientific);
+      setMessage(`Detected: ${matched?.common || guessedScientific}`);
     }
 
     setLoading(false);
   };
 
   /* ================= SUBMIT ================= */
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -246,7 +252,6 @@ export default function AddTree() {
   };
 
   /* ================= UI ================= */
-
   return (
     <div style={{ padding: 20, width: 450 }}>
       <h2>Add Tree</h2>
@@ -255,7 +260,8 @@ export default function AddTree() {
       <form onSubmit={handleSubmit}>
         <input type="file" accept="image/*" onChange={handleImageUpload} />
 
-        <br /><br />
+        <br />
+        <br />
 
         <label>Plant organ</label>
         <select value={organ} onChange={(e) => setOrgan(e.target.value)}>
@@ -264,20 +270,27 @@ export default function AddTree() {
           <option value="fruit">Fruit</option>
         </select>
 
-        <br /><br />
+        <br />
+        <br />
 
+        {/* Species input with datalist for auto suggestions */}
         <label>Species</label>
-        {speciesOptions.length > 0 ? (
-          <select value={species} onChange={(e) => setSpecies(e.target.value)}>
-            {speciesOptions.map((s, i) => (
-              <option key={i}>{s}</option>
-            ))}
-          </select>
-        ) : (
-          <input value={species} readOnly placeholder="Auto-detected" />
-        )}
+        <input
+          list="speciesList"
+          value={species}
+          onChange={(e) => setSpecies(e.target.value)}
+          placeholder="Type or select species"
+        />
+        <datalist id="speciesList">
+          {speciesOptions.map((s, i) => (
+            <option key={i} value={s.common}>
+              {s.common} ({s.scientific})
+            </option>
+          ))}
+        </datalist>
 
-        <br /><br />
+        <br />
+        <br />
 
         <label>Age mode</label>
         <select value={ageMode} onChange={(e) => setAgeMode(e.target.value)}>
@@ -286,7 +299,8 @@ export default function AddTree() {
           <option value="unknown">Unknown</option>
         </select>
 
-        <br /><br />
+        <br />
+        <br />
 
         {ageMode === "exact" && (
           <input
@@ -299,7 +313,10 @@ export default function AddTree() {
         )}
 
         {ageMode === "range" && (
-          <select value={ageRange} onChange={(e) => setAgeRange(e.target.value)}>
+          <select
+            value={ageRange}
+            onChange={(e) => setAgeRange(e.target.value)}
+          >
             <option value="seedling">Seedling</option>
             <option value="young">Young</option>
             <option value="mature">Mature</option>
@@ -307,7 +324,8 @@ export default function AddTree() {
           </select>
         )}
 
-        <br /><br />
+        <br />
+        <br />
 
         <button type="button" onClick={captureLocation}>
           📍 Capture Location

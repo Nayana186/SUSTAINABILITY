@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+
+
 const GamesHome = () => {
   return (
     <div className="games-home" style={{ padding: "2rem", textAlign: "center" }}>

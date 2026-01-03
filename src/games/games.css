@@ -1,0 +1,123 @@
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ================= PAGE ================= */
+.games-home {
+  min-height: 100vh;
+  padding: 120px 40px 60px;
+  text-align: center;
+
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+  color: #ffffff;
+
+  background: linear-gradient(
+      rgba(12, 35, 12, 0.78),
+      rgba(12, 35, 12, 0.78)
+    ),
+    url("/forest.jpeg") center / cover no-repeat;
+}
+
+/* ================= TITLE ================= */
+.games-home h1 {
+  font-size: 32px;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+.games-subtitle {
+  font-size: 16px;
+  color: #d9ffd9;
+  margin-bottom: 40px;
+}
+
+/* ================= GRID ================= */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ================= GAME CARD ================= */
+.game-card {
+  position: relative;
+  padding: 32px 26px;
+
+  background: rgba(22, 55, 22, 0.78);
+  backdrop-filter: blur(6px);
+
+  border: 3px solid #7ed957;
+  border-radius: 22px;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.55);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.7);
+}
+
+/* ================= CARD CONTENT ================= */
+.game-card h2 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #eaffea;
+}
+
+.game-card p {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #d6ffd6;
+}
+
+/* ================= PLAY BUTTON ================= */
+.play-btn {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 10px 26px;
+
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  color: #173d17;
+  background: linear-gradient(145deg, #b7ff8a, #7ed957);
+
+  border-radius: 30px;
+  text-decoration: none;
+
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .games-home {
+    padding: 100px 20px 40px;
+  }
+
+  .games-home h1 {
+    font-size: 26px;
+  }
+
+  .game-card {
+    padding: 26px 20px;
+  }
+}

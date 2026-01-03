@@ -1,48 +1,84 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import questions from "./questions";
 
-const EcoQuiz = () => {
-  // Check localStorage if quiz was already attempted
-  const attemptedBefore = localStorage.getItem("ecoQuizAttempted") === "true";
+import { db } from "../../firebase";
+import { doc, updateDoc, increment } from "firebase/firestore";
+import { useUser } from "../../AuthProvider";
 
+/* ================= CONFIG ================= */
+const DEMO_MODE = true;
+
+const EcoQuiz = () => {
+  const { user } = useUser();
+
+  /* ================= STATE ================= */
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(attemptedBefore);
-  const [started, setStarted] = useState(false); // Track if game started
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
   const [timer, setTimer] = useState(5);
 
+  /* CREDIT PROGRESS */
+  const [creditProgress, setCreditProgress] = useState(0);
+  const [creditsEarned, setCreditsEarned] = useState(0);
+
   const inputRef = useRef(null);
 
-  // Move to next question
+  /* ================= QUIZ PROGRESS ================= */
+  const quizProgress = ((current + 1) / questions.length) * 100;
+
+  /* ================= REWARD CREDIT ================= */
+  const rewardCredit = async () => {
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid), {
+      credits: increment(1),
+    });
+
+    setCreditsEarned((c) => c + 1);
+  };
+
+  /* ================= NEXT QUESTION ================= */
   const nextQuestion = useCallback(() => {
     setUserAnswer("");
     setTimer(5);
+
     if (current + 1 < questions.length) {
       setCurrent((prev) => prev + 1);
     } else {
       setFinished(true);
-      localStorage.setItem("ecoQuizAttempted", "true"); // Mark quiz as attempted
     }
   }, [current]);
 
-  // Submit answer
+  /* ================= SUBMIT ================= */
   const handleSubmit = useCallback(() => {
-    if (
+    const isCorrect =
       userAnswer.trim().toLowerCase() ===
-      questions[current].answer.toLowerCase()
-    ) {
-      setScore((prev) => prev + 1);
+      questions[current].answer.toLowerCase();
+
+    if (isCorrect) {
+      setScore((s) => s + 1);
+
+      setCreditProgress((prev) => {
+        const updated = prev + 25;
+        if (updated >= 100) {
+          rewardCredit();
+          return 0;
+        }
+        return updated;
+      });
     }
+
     nextQuestion();
   }, [userAnswer, current, nextQuestion]);
 
-  // Timer effect
+  /* ================= TIMER ================= */
   useEffect(() => {
     if (!started || finished) return;
 
     if (timer === 0) {
-      handleSubmit(); // Auto-submit
+      handleSubmit();
       return;
     }
 
@@ -51,105 +87,131 @@ const EcoQuiz = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timer, finished, started, handleSubmit]);
+  }, [timer, started, finished, handleSubmit]);
 
-  // Focus input
-  useEffect(() => {
-    if (inputRef.current) inputRef.current.focus();
-  }, [current, started]);
-
-  // Start quiz (only works if not attempted)
+  /* ================= START / RESET ================= */
   const handleStart = () => {
-    if (!started && !attemptedBefore) setStarted(true);
+    setStarted(true);
+    setFinished(false);
+    setCurrent(0);
+    setScore(0);
+    setCreditProgress(0);
+    setCreditsEarned(0);
   };
 
+  /* ================= UI ================= */
   return (
     <div
       style={{
-        padding: "2rem",
+        minHeight: "100vh",
+        padding: "120px 30px",
         textAlign: "center",
-        maxWidth: "500px",
-        margin: "auto",
-        border: "2px solid #4CAF50",
-        borderRadius: "10px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+        color: "#fff",
+        background:
+          "linear-gradient(rgba(12,35,12,0.8), rgba(12,35,12,0.8)), url('/forest.jpeg') center/cover no-repeat",
+        fontFamily: "Poppins, Segoe UI, Arial",
       }}
     >
       <h1>🧠 Eco Quiz</h1>
 
-      {!started && !attemptedBefore ? (
+      {/* ================= QUIZ PROGRESS BAR ================= */}
+      {started && !finished && (
+        <div style={{ maxWidth: "420px", margin: "16px auto" }}>
+          <div className="progress-container">
+            <div
+              className="progress-bar"
+              style={{ width: `${quizProgress}%` }}
+            />
+          </div>
+          <p style={{ fontSize: "14px", color: "#d9ffd9" }}>
+            Question {current + 1} / {questions.length}
+          </p>
+        </div>
+      )}
+
+      {/* ================= CREDIT PROGRESS BAR ================= */}
+      {started && !finished && (
+        <div style={{ maxWidth: "420px", margin: "20px auto" }}>
+          <span style={{ fontSize: "14px", color: "#b8ffb0" }}>
+            🌱 Awareness → Credit
+          </span>
+          <div className="progress-container">
+            <div
+              className="progress-bar"
+              style={{ width: `${creditProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {!started ? (
+        <button className="quiz-btn" onClick={handleStart}>
+          Start Quiz
+        </button>
+      ) : finished ? (
         <>
-          <h2>The game is about to start!</h2>
-          <button
-            onClick={handleStart}
-            style={{
-              padding: "0.8rem 1.5rem",
-              fontSize: "1.1rem",
-              borderRadius: "5px",
-              cursor: "pointer",
-              backgroundColor: "#4CAF50",
-              color: "#fff",
-              border: "none",
-            }}
-          >
-            Start Quiz
+          <h2>✅ Quiz Completed</h2>
+          <p>
+            Score: <strong>{score}</strong> / {questions.length}
+          </p>
+          <p>Credits earned: 🌱 {creditsEarned}</p>
+
+          <button className="quiz-btn" onClick={handleStart}>
+            Play Again
           </button>
         </>
-      ) : finished || attemptedBefore ? (
-        <h2>
-          {attemptedBefore ? (
-            <>
-              ❌ You have already attempted this quiz.
-              <br />
-              Your score was: {score} / {questions.length}
-            </>
-          ) : (
-            <>
-              ✅ Quiz finished!
-              <br />
-              Your Score: {score} / {questions.length}
-            </>
-          )}
-        </h2>
       ) : (
         <>
-          <h3>Time Left: {timer}s</h3>
+          <h3>⏳ Time Left: {timer}s</h3>
           <h3>{questions[current].question}</h3>
 
           <input
             ref={inputRef}
-            type="text"
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
-            placeholder="Type your answer here..."
+            placeholder="Type your answer..."
             style={{
-              padding: "0.7rem",
-              fontSize: "1.1rem",
+              padding: "10px",
               width: "80%",
-              marginBottom: "1rem",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              outline: "none",
+              borderRadius: "8px",
+              border: "none",
             }}
           />
           <br />
 
-          <button
-            onClick={handleSubmit}
-            style={{
-              padding: "0.7rem 1.5rem",
-              fontSize: "1rem",
-              borderRadius: "5px",
-              cursor: "pointer",
-              backgroundColor: "#4CAF50",
-              color: "#fff",
-              border: "none",
-            }}
-          >
+          <button className="quiz-btn" onClick={handleSubmit}>
             Submit
           </button>
         </>
       )}
+
+      {/* ================= STYLES ================= */}
+      <style>{`
+        .progress-container {
+          width: 100%;
+          height: 14px;
+          background: #ffffff;
+          border-radius: 20px;
+          overflow: hidden;
+          margin-top: 6px;
+        }
+        .progress-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #4caf50, #1f7f43);
+          transition: width 0.4s ease;
+        }
+        .quiz-btn {
+          margin-top: 20px;
+          padding: 10px 28px;
+          border-radius: 25px;
+          border: none;
+          font-weight: 700;
+          background: linear-gradient(145deg, #b7ff8a, #7ed957);
+          color: #173d17;
+          cursor: pointer;
+          box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+        }
+      `}</style>
     </div>
   );
 };
