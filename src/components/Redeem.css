@@ -1,0 +1,146 @@
+/* ================= PAGE ================= */
+.redeem-page {
+  min-height: 100vh;
+  padding: 60px 16px;
+
+  background-color: #0f2f23; /* dark forest green */
+
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ================= CARD ================= */
+.redeem-card {
+  width: 100%;
+  max-width: 620px;
+
+  background-color: #143d2b; /* deep green */
+  border-radius: 20px;
+  padding: 32px 36px;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* ================= HEADINGS ================= */
+.redeem-card h1 {
+  text-align: center;
+  margin-bottom: 6px;
+  font-size: 26px;
+  color: #d8f3dc;
+}
+
+.redeem-card h2 {
+  margin-top: 26px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #b7e4c7;
+}
+
+/* ================= INFO ================= */
+.redeem-info {
+  font-size: 14px;
+  color: #cdeac0;
+  margin-bottom: 6px;
+}
+
+.redeem-credits {
+  font-size: 20px;
+  font-weight: 600;
+  color: #95d5b2;
+  margin-bottom: 18px;
+}
+
+/* ================= ADMIN BUTTON ================= */
+.admin-btn {
+  display: inline-block;
+  margin-bottom: 20px;
+
+  padding: 8px 16px;
+  background-color: #ffd166;
+  color: #1b4332;
+
+  border: none;
+  border-radius: 8px;
+
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ================= REWARD LIST ================= */
+.reward-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.reward-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 0;
+  border-bottom: 1px solid #2d6a4f;
+
+  font-size: 15px;
+  color: #e9f5ec;
+}
+
+/* ================= BUTTON ================= */
+.redeem-btn {
+  padding: 6px 14px;
+
+  background-color: #2d6a4f;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 6px;
+
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.redeem-btn:hover {
+  background-color: #40916c;
+}
+
+.redeem-btn:disabled {
+  background-color: #4f5d55;
+  cursor: not-allowed;
+}
+
+/* ================= QR ================= */
+.qr-box {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.qr-box h3 {
+  margin-bottom: 10px;
+  color: #d8f3dc;
+}
+
+.qr-box p {
+  color: #b7e4c7;
+}
+
+.email-success {
+  margin-top: 10px;
+  color: #95d5b2;
+  font-weight: 600;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 480px) {
+  .redeem-card {
+    padding: 24px;
+  }
+
+  .reward-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
