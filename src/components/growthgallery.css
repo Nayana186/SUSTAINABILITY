@@ -1,0 +1,128 @@
+/* ===== PAGE BACKGROUND ===== */
+.growth-page {
+  min-height: 100vh;
+  padding: 40px 20px;
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: "Georgia", serif;
+}
+
+
+/* ===== TITLE ===== */
+.growth-title {
+  text-align: center;
+  color: #e9ffe3;
+  font-size: 28px;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+}
+
+/* ===== MAIN CARD ===== */
+.growth-card {
+  background: rgba(25, 60, 25, 0.55);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(140, 220, 140, 0.6);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== HEADER ===== */
+.growth-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* ===== TREE IMAGE ===== */
+.tree-main-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #a8ff9e;
+}
+
+/* ===== TREE INFO ===== */
+.growth-header h3 {
+  color: #eaffea;
+  margin: 0;
+}
+
+.growth-header p {
+  color: #c9f7c9;
+  margin-top: 4px;
+}
+
+/* ===== SHOW / HIDE BUTTON ===== */
+.toggle-btn {
+  margin-left: auto;
+  background: #0b5ed7;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.toggle-btn:hover {
+  background: #0a58ca;
+}
+
+/* ===== FILE INPUT ===== */
+.upload-input {
+  margin-top: 15px;
+  color: #fff;
+}
+
+/* ===== GROWTH IMAGE GRID ===== */
+.growth-images {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* ===== GROWTH IMAGE CARD ===== */
+.growth-img-card {
+  background: rgba(10, 30, 10, 0.7);
+  border-radius: 12px;
+  padding: 8px;
+  text-align: center;
+  width: 130px;
+  border: 1px solid rgba(150, 255, 150, 0.4);
+}
+
+/* ===== GROWTH IMAGE ===== */
+.growth-img-card img {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ===== CO2 TEXT ===== */
+.growth-img-card p {
+  color: #9cff9c;
+  font-size: 13px;
+  margin: 6px 0;
+}
+
+/* ===== DELETE BUTTON ===== */
+.delete-btn {
+  background: #c00000;
+  color: white;
+  border: none;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #a00000;
+}

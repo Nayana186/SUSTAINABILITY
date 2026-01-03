@@ -9,6 +9,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../AuthProvider";
+import "./growthgallery.css";
 
 const GROWTH_BONUS_CO2 = 50;
 
@@ -82,27 +83,11 @@ export default function GrowthGallery() {
         uploadedAt: timestamp,
       };
 
-      setTrees((prev) =>
-        prev.map((t) =>
-          t.id === treeId
-            ? {
-                ...t,
-                growthUpdates: [...(t.growthUpdates || []), newUpdate],
-                totalCO2TillNow:
-                  (t.totalCO2TillNow || 0) + GROWTH_BONUS_CO2,
-              }
-            : t
-        )
-      );
+      const tree = trees.find((t) => t.id === treeId);
 
       await updateDoc(doc(db, "trees", treeId), {
-        growthUpdates: [
-          ...(trees.find((t) => t.id === treeId)?.growthUpdates || []),
-          newUpdate,
-        ],
-        totalCO2TillNow:
-          (trees.find((t) => t.id === treeId)?.totalCO2TillNow || 0) +
-          GROWTH_BONUS_CO2,
+        growthUpdates: [...(tree.growthUpdates || []), newUpdate],
+        totalCO2TillNow: (tree.totalCO2TillNow || 0) + GROWTH_BONUS_CO2,
       });
     } finally {
       setUploadingTreeId(null);
@@ -110,55 +95,47 @@ export default function GrowthGallery() {
   };
 
   /* ================= DELETE ================= */
-const handleDeleteGrowth = async (treeId, growth) => {
-  if (!window.confirm("Delete this growth image?")) return;
+  const handleDeleteGrowth = async (treeId, growth) => {
+    if (!window.confirm("Delete this growth image?")) return;
 
-  try {
-    const tree = trees.find((t) => t.id === treeId);
-    if (!tree) return;
+    try {
+      const tree = trees.find((t) => t.id === treeId);
+      if (!tree) return;
 
-    const updatedGrowth = tree.growthUpdates.filter(
-      (g) => g.uploadedAt !== growth.uploadedAt
-    );
+      const updatedGrowth = tree.growthUpdates.filter(
+        (g) => g.uploadedAt !== growth.uploadedAt
+      );
 
-    await updateDoc(doc(db, "trees", treeId), {
-      growthUpdates: updatedGrowth,
-      totalCO2TillNow:
-        Math.max(
+      await updateDoc(doc(db, "trees", treeId), {
+        growthUpdates: updatedGrowth,
+        totalCO2TillNow: Math.max(
           (tree.totalCO2TillNow || 0) - (growth.bonusCO2 || 0),
           0
         ),
-    });
-  } catch (err) {
-    console.error("Delete failed:", err);
-  }
-};
-
+      });
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
 
   return (
-    <div style={{ maxWidth: 900, padding: 20 }}>
-      <h1>🌿 Growth Gallery</h1>
+    <div
+     className="growth-page"
+     style={{ backgroundImage: "url(/forest.jpg)" }}
+     >
+      <h1 className="growth-title">GROWTH GALLERY</h1>
 
       {trees.map((tree) => {
         const expanded = expandedTrees[tree.id];
 
         return (
-          <div
-            key={tree.id}
-            style={{
-              marginTop: 20,
-              border: "1px solid #ddd",
-              padding: 16,
-              borderRadius: 10,
-            }}
-          >
-            <div style={{ display: "flex", gap: 16 }}>
+          <div key={tree.id} className="growth-card">
+            {/* HEADER */}
+            <div className="growth-header">
               <img
                 src={tree.imageUrl}
-                alt={`${tree.species} tree`}
-                width={100}
-                height={100}
-                style={{ borderRadius: 8 }}
+                alt={tree.species}
+                className="tree-main-img"
               />
 
               <div>
@@ -167,49 +144,38 @@ const handleDeleteGrowth = async (treeId, growth) => {
               </div>
 
               <button
+                className="toggle-btn"
                 onClick={() =>
                   setExpandedTrees((p) => ({
                     ...p,
                     [tree.id]: !p[tree.id],
                   }))
                 }
-                style={{ marginLeft: "auto" }}
               >
                 {expanded ? "Hide" : "Show"}
               </button>
             </div>
 
+            {/* EXPANDED CONTENT */}
             {expanded && (
               <>
                 <input
                   type="file"
                   accept="image/*"
+                  className="upload-input"
                   disabled={uploadingTreeId === tree.id}
                   onChange={(e) =>
                     handleGrowthUpload(tree.id, e.target.files[0])
                   }
                 />
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    flexWrap: "wrap",
-                    marginTop: 12,
-                  }}
-                >
+                <div className="growth-images">
                   {tree.growthUpdates?.map((g, i) => (
-                    <div key={i} style={{ textAlign: "center" }}>
-                      <img
-                        src={g.imageUrl}
-                        alt={`Growth update for ${tree.species}`}
-                        width={120}
-                        height={120}
-                        style={{ borderRadius: 8 }}
-                      />
-                      <p>+{g.bonusCO2} kg</p>
+                    <div key={i} className="growth-img-card">
+                      <img src={g.imageUrl} alt="growth update" />
+                      <p>+{g.bonusCO2} kg CO₂</p>
                       <button
-                        style={{ color: "red", fontSize: 12 }}
+                        className="delete-btn"
                         onClick={() => handleDeleteGrowth(tree.id, g)}
                       >
                         🗑 Delete
@@ -225,3 +191,4 @@ const handleDeleteGrowth = async (treeId, growth) => {
     </div>
   );
 }
+
