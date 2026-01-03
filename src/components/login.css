@@ -1,90 +1,147 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Poppins:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
 
+/* ---------- Global reset ---------- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Georgia", serif;
 }
 
+/* ---------- Background container ---------- */
 .container {
-  position: relative;
-  width: 100%;
-  backdrop-filter: blur(2px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
 }
 
+/* ---------- TOP TITLE BAR ---------- */
 .title {
-  position: absolute;
-  top: 60px;
-  width: 100%;
-  text-align: center;
+  position: relative;
+  width: 90%;
+  max-width: 1000px;
+  height: 70px;
+
+  background-color: #2f4b1c;
+  border: 3px solid #e8ffe8;
+  border-radius: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  font-size: 44px;
+  letter-spacing: 1.5px;
+
   font-family: 'Playfair Display', serif;
-  font-size: 56px;
-  color: #f2e3c6;
+
+  margin-bottom: 80px;
 }
 
+/* ---------- CIRCULAR LOGO ---------- */
+.title::before {
+  content: "CQ";
+  position: absolute;
+  left: 130px;          /* moved towards right */
+
+  width: 110px;         /* increased size */
+  height: 110px;        /* increased size */
+  border-radius: 50%;
+
+  background-color: #ffffff;
+  color: #2f4b1c;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;      /* increased text size */
+  font-weight: 700;
+
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- LOGIN CARD ---------- */
 .login-box {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 420px;
-  padding: 30px 40px 40px;
-  background: rgba(140, 160, 110, 0.45);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(8px);
+  width: 360px;
+  padding: 30px 35px;
+
+  background: rgba(145, 170, 110, 0.55);
+  border-radius: 18px;
+  border: 3px solid rgba(200, 255, 200, 0.6);
+
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 18px rgba(180, 255, 180, 0.6);
+
+  text-align: center;
 }
 
+/* ---------- LOGIN TEXT ---------- */
 .login-box h2 {
-  text-align: center;
-  font-family: 'Playfair Display', serif;
-  letter-spacing: 3px;
+  font-size: 26px;
   margin-bottom: 20px;
-  color: #f7f2e8;
+  letter-spacing: 2px;
+  color: #ffffff;
 }
 
+/* ---------- LABELS ---------- */
 .label {
-  margin-top: 15px;
-  font-size: 18px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  border: none;
-  border-radius: 8px;
-  outline: none;
-}
-
-button {
-  display: block;
-  margin: 25px auto 0;
-  padding: 10px 40px;
-  border: none;
-  border-radius: 25px;
-  font-size: 18px;
-  background: #0076cc;
-  color: white;
-  cursor: pointer;
-}
-.auth-toggle {
-  margin-top: 15px;
-  text-align: center;
+  text-align: left;
   font-size: 14px;
-  color:black;                 /* text color */
-  cursor: pointer;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+  color: #ffffff;
+}
 
-  text-decoration-line: none;
-  
+/* ---------- INPUTS ---------- */
+.login-box input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- LOGIN BUTTON ---------- */
+.login-box button {
+  margin-top: 25px;
+  padding: 10px 28px;
+
+  border: none;
+  border-radius: 20px;
+
+  background-color: #0b6bdc;
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.login-box button:hover {
+  background-color: #084fa5;
+}
+
+/* ---------- TOGGLE TEXT ---------- */
+.auth-toggle {
+  margin-top: 18px;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  color: #ffffff;
 }
 
 .auth-toggle:hover {
-                  /* text hover color */
-  text-decoration: underline;
-  text-decoration-color:black; /* underline hover color */
+  color: #e6ffe6;
 }
-
-
-

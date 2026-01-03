@@ -1,7 +1,19 @@
+
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useUser } from "../AuthProvider";
+import "./profile.css";
+const bgStyle = {
+  backgroundImage: `linear-gradient(
+    rgba(0,0,0,0.35),
+    rgba(0,0,0,0.35)
+  ), url(${process.env.PUBLIC_URL}/forest.jpg)`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+};
+
 
 /* ================= BADGES ================= */
 const badgeIcons = {
@@ -89,58 +101,94 @@ export default function Profile() {
 
   /* ================= UI ================= */
   return (
-    <div style={{ padding: 30, maxWidth: 600 }}>
-      <h1>👤 Your Profile</h1>
+  <div className="profile-page" style={bgStyle}>
+    <h1 className="profile-title">MY PROFILE</h1>
 
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Trees Added:</strong> {treeCount}</p>
-      <p><strong>Total CO₂ (kg):</strong> {rawCO2.toFixed(1)}</p>
-      <p><strong>Verified CO₂ (kg):</strong> {verifiedCO2.toFixed(1)}</p>
-      <p><strong>Credits:</strong> {credits}</p>
+    <div className="profile-card">
+      {/* Avatar circle */}
+      <div className="profile-avatar">
+  <div className="avatar-head"></div>
+  <div className="avatar-body"></div>
 
-      <h2>🏅 Badges Earned</h2>
-      <div style={{ fontSize: 24 }}>
-        {badges.length > 0
-          ? badges.map((b) => (
-              <span key={b} style={{ marginRight: 10 }}>
-                {badgeIcons[b]}
-              </span>
-            ))
-          : "No badges yet. Start adding trees!"}
-      </div>
+  {/* small badge */}
+  <div className="avatar-badge">★</div>
+</div>
 
-      <h2 style={{ marginTop: 30 }}>🌳 Progress</h2>
-      <div>
-        <label>CO₂ Contribution Progress (toward next credit)</label>
+
+      {/* Gold badge */}
+      <div className="profile-badge"></div>
+
+      {/* PROFILE DETAILS */}
+      <p className="profile-row">
+        <span>Email</span>
+        <span>:</span>
+        <span>{user.email}</span>
+      </p>
+
+      <p className="profile-row">
+        <span>Trees Added</span>
+        <span>:</span>
+        <span>{treeCount}</span>
+      </p>
+
+      <p className="profile-row">
+        <span>Total CO₂</span>
+        <span>:</span>
+        <span>{rawCO2.toFixed(1)}</span>
+      </p>
+
+      <p className="profile-row">
+        <span>Verified CO₂</span>
+        <span>:</span>
+        <span>{verifiedCO2.toFixed(1)}</span>
+      </p>
+
+      <p className="profile-row">
+        <span>Credits</span>
+        <span>:</span>
+        <span>{credits}</span>
+      </p>
+
+      <p className="profile-row">
+        <span>Badges earned</span>
+        <span>:</span>
+        <span>{badges.length}</span>
+      </p>
+
+      <p className="profile-row">
+        <span>Location</span>
+        <span>:</span>
+        <span>Current location</span>
+      </p>
+
+      {/* PROGRESS */}
+      <p className="profile-row">
+        <span>Progress</span>
+        <span>:</span>
+        <span>Contribution towards next credit</span>
+      </p>
+
+      <div className="progress-container">
         <div
+          className="progress-bar"
           style={{
-            background: "#eee",
-            borderRadius: 6,
-            overflow: "hidden",
-            height: 24,
-            marginTop: 5,
+            width: `${Math.min(
+              (verifiedCO2 / CREDIT_THRESHOLD) * 100,
+              100
+            )}%`,
           }}
-        >
-          <div
-            style={{
-              width: `${Math.min(
-                (verifiedCO2 / CREDIT_THRESHOLD) * 100,
-                100
-              )}%`,
-              background: "#4caf50",
-              height: "100%",
-              transition: "width 0.3s",
-            }}
-          />
-        </div>
-        <p>
-          {Math.min(
-            (verifiedCO2 / CREDIT_THRESHOLD) * 100,
-            100
-          ).toFixed(0)}
-          % of next credit
-        </p>
+        />
       </div>
+
+      <p className="progress-text">
+        {Math.min(
+          (verifiedCO2 / CREDIT_THRESHOLD) * 100,
+          100
+        ).toFixed(0)}
+        % of next credit
+      </p>
     </div>
-  );
+  </div>
+);
+
 }

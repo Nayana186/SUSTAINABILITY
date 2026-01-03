@@ -39,7 +39,7 @@ export default function AuthPage() {
     <div
       className="container"
       style={{
-        background: "url('/background.jpg') center / cover no-repeat",
+        background: "url('/forest.jpg') center / cover no-repeat",
         minHeight: "100vh",
       }}
     >
