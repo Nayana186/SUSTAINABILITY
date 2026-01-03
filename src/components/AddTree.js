@@ -9,12 +9,12 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { useUser } from "../AuthProvider";
+import { useNavigate } from "react-router-dom"; // <- import navigate
 
 /* ================= CONFIG ================= */
 const DAILY_LIMIT = 3;
 const DEMO_EMAIL = "b24ee046@gmail.com"; // unlimited access
 
-/* Manual fallback mapping for scientific → common names */
 const speciesMap = {
   "Azadirachta indica": "Neem",
   "Mangifera indica": "Mango",
@@ -22,7 +22,6 @@ const speciesMap = {
   "Bambusa vulgaris": "Bamboo",
 };
 
-/* CO₂ per species */
 const speciesCO2 = {
   Neem: 22,
   Mango: 30,
@@ -30,7 +29,6 @@ const speciesCO2 = {
   Bamboo: 12,
 };
 
-/* Age ranges */
 const ageRangeMap = {
   seedling: 1,
   young: 3,
@@ -38,19 +36,17 @@ const ageRangeMap = {
   old: 12,
 };
 
-/* ================= COMPONENT ================= */
 export default function AddTree() {
   const { user } = useUser();
+  const navigate = useNavigate(); // <- initialize navigate
 
   const [species, setSpecies] = useState("");
   const [speciesOptions, setSpeciesOptions] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [organ, setOrgan] = useState("leaf");
-
   const [ageMode, setAgeMode] = useState("exact");
   const [age, setAge] = useState("");
   const [ageRange, setAgeRange] = useState("young");
-
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -61,7 +57,6 @@ export default function AddTree() {
       setMessage("Geolocation not supported");
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocation({
@@ -83,11 +78,7 @@ export default function AddTree() {
     formData.append("file", file);
     formData.append("upload_preset", preset);
 
-    const res = await fetch(url, {
-      method: "POST",
-      body: formData,
-    });
-
+    const res = await fetch(url, { method: "POST", body: formData });
     const data = await res.json();
     return data.secure_url;
   };
@@ -103,11 +94,9 @@ export default function AddTree() {
         method: "POST",
         body: formData,
       });
-
       const data = await response.json();
 
       if (data?.results?.length > 0) {
-        // Map API results to {scientific, common, imageUrl}
         const options = data.results.map((r) => ({
           scientific: r.species.scientificName,
           common:
@@ -118,8 +107,6 @@ export default function AddTree() {
         }));
 
         setSpeciesOptions(options);
-
-        // Return first option scientific name for saving
         return options[0].scientific;
       }
 
@@ -222,22 +209,17 @@ export default function AddTree() {
         ageMode,
         ageEstimateType,
         confidence,
-
         co2PerYear,
         totalCO2TillNow,
-
         imageUrl,
         location,
         trustLevel: "photo",
-
         userId: user.uid,
         userEmail: user.email,
-
         createdAt: serverTimestamp(),
       });
 
       setMessage("Tree added successfully 🌱");
-
       setSpecies("");
       setAge("");
       setImageFile(null);
@@ -259,9 +241,7 @@ export default function AddTree() {
 
       <form onSubmit={handleSubmit}>
         <input type="file" accept="image/*" onChange={handleImageUpload} />
-
-        <br />
-        <br />
+        <br /><br />
 
         <label>Plant organ</label>
         <select value={organ} onChange={(e) => setOrgan(e.target.value)}>
@@ -269,11 +249,8 @@ export default function AddTree() {
           <option value="flower">Flower</option>
           <option value="fruit">Fruit</option>
         </select>
+        <br /><br />
 
-        <br />
-        <br />
-
-        {/* Species input with datalist for auto suggestions */}
         <label>Species</label>
         <input
           list="speciesList"
@@ -289,8 +266,7 @@ export default function AddTree() {
           ))}
         </datalist>
 
-        <br />
-        <br />
+        <br /><br />
 
         <label>Age mode</label>
         <select value={ageMode} onChange={(e) => setAgeMode(e.target.value)}>
@@ -298,9 +274,7 @@ export default function AddTree() {
           <option value="range">Range</option>
           <option value="unknown">Unknown</option>
         </select>
-
-        <br />
-        <br />
+        <br /><br />
 
         {ageMode === "exact" && (
           <input
@@ -313,10 +287,7 @@ export default function AddTree() {
         )}
 
         {ageMode === "range" && (
-          <select
-            value={ageRange}
-            onChange={(e) => setAgeRange(e.target.value)}
-          >
+          <select value={ageRange} onChange={(e) => setAgeRange(e.target.value)}>
             <option value="seedling">Seedling</option>
             <option value="young">Young</option>
             <option value="mature">Mature</option>
@@ -324,25 +295,40 @@ export default function AddTree() {
           </select>
         )}
 
-        <br />
-        <br />
+        <br /><br />
 
         <button type="button" onClick={captureLocation}>
           📍 Capture Location
         </button>
-
         {location && (
           <p>
             Lat: {location.lat.toFixed(5)}, Lng: {location.lng.toFixed(5)}
           </p>
         )}
-
         <br />
 
         <button disabled={loading}>
           {loading ? "Processing..." : "Add Tree"}
         </button>
       </form>
+
+      <br />
+      {/* ================= NEW BUTTON ================= */}
+      <button
+  onClick={() => navigate("/plantation")}
+  style={{
+    marginTop: 10,
+    background: "#4caf50",
+    color: "white",
+    padding: "6px 12px",
+    border: "none",
+    borderRadius: 4,
+    cursor: "pointer",
+  }}
+>
+  Switch to Plantation / Farm Mode
+</button>
+
     </div>
   );
 }

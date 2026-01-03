@@ -6,28 +6,28 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { AuthProvider } from "./AuthProvider";
+import { signOut } from "firebase/auth";
+import { auth } from "./firebase";
 
+/* ================= COMPONENT IMPORTS ================= */
 import Home from "./components/Home";
-import AddTree from "./components/AddTree";
 import TreeList from "./components/TreeList";
 import Leaderboard from "./components/Leaderboard";
 import AuthPage from "./components/Login";
 import GrowthGallery from "./components/GrowthGallery";
 import Profile from "./components/Profile";
 import Redeem from "./components/Redeem";
+import TreesPage from "./components/TreesPage";
+import AddTree from "./components/AddTree";
+import PlantationForm from "./components/PlantationForm";
 
+/* ================= GAMES ================= */
 import GamesHome from "./games/GamesHome";
 import EcoQuiz from "./games/EcoQuiz/EcoQuiz";
 import CarbonGuesser from "./games/CarbonGuesser/CarbonGuesser";
 import PlantTicTacToe from "./games/Tic-Tac-Toe/TicTacToe";
-import TreesPage from "./components/TreesPage"; // make sure the path is correct
 
-
-import { signOut } from "firebase/auth";
-import { auth } from "./firebase";
-
-/* ================= DASHBOARD ================= */
-
+/* ================= DASHBOARD COMPONENT ================= */
 function Dashboard() {
   const navigate = useNavigate();
 
@@ -42,11 +42,14 @@ function Dashboard() {
         fontFamily: "Arial, sans-serif",
         padding: 30,
         position: "relative",
+        minHeight: "100vh",
+        background: "#f0f8f0",
       }}
     >
+      {/* TITLE */}
       <h1 style={{ textAlign: "center" }}>🌿 CQuestER Dashboard</h1>
 
-      {/* Logout */}
+      {/* LOGOUT */}
       <button
         onClick={handleLogout}
         style={{
@@ -66,20 +69,54 @@ function Dashboard() {
 
       {/* NAVIGATION */}
       <div style={{ position: "absolute", top: 20, left: 20 }}>
-        <button onClick={() => navigate("/")}>🏠 Home</button><br />
-        <button onClick={() => navigate("/leaderboard")}>🏆 Leaderboard</button><br />
-        <button onClick={() => navigate("/growth-gallery")}>🌿 Growth Gallery</button><br />
-        <button onClick={() => navigate("/profile")}>👤 Profile</button><br />
-        <button onClick={() => navigate("/redeem")}>🎁 Redeem</button><br />
+        <button onClick={() => navigate("/")}>🏠 Home</button>
+        <br />
+        <button onClick={() => navigate("/leaderboard")}>🏆 Leaderboard</button>
+        <br />
+        <button onClick={() => navigate("/growth-gallery")}>🌿 Growth Gallery</button>
+        <br />
+        <button onClick={() => navigate("/profile")}>👤 Profile</button>
+        <br />
+        <button onClick={() => navigate("/redeem")}>🎁 Redeem</button>
+        <br />
         <button onClick={() => navigate("/games")}>🎮 Mini Games</button>
       </div>
 
       {/* MAIN CONTENT */}
-      <div style={{ display: "flex", gap: 40, marginTop: 80 }}>
-        <div style={{ flex: 1 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 40,
+          marginTop: 100,
+          flexWrap: "wrap",
+        }}
+      >
+        {/* LEFT PANEL: AddTree / Plantation */}
+        <div
+          style={{
+            flex: 1,
+            minWidth: 400,
+            background: "#e8f3e8",
+            padding: 20,
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+        >
+          {/* AddTree component already has redirect button to PlantationForm */}
           <AddTree />
         </div>
-        <div style={{ flex: 2 }}>
+
+        {/* RIGHT PANEL: Tree List */}
+        <div
+          style={{
+            flex: 2,
+            minWidth: 500,
+            background: "#e8f3e8",
+            padding: 20,
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+        >
           <TreeList />
         </div>
       </div>
@@ -88,7 +125,6 @@ function Dashboard() {
 }
 
 /* ================= APP ROOT ================= */
-
 function App() {
   return (
     <AuthProvider>
@@ -108,7 +144,8 @@ function App() {
           <Route path="/redeem" element={<Redeem />} />
           <Route path="/trees" element={<TreesPage />} />
 
-
+          {/* PLANTATION FORM */}
+          <Route path="/plantation" element={<PlantationForm />} />
 
           {/* GAMES */}
           <Route path="/games" element={<GamesHome />} />

@@ -1,0 +1,119 @@
+/* ===== Container ===== */
+.plantation-form {
+  max-width: 450px;
+  margin: auto;
+  padding: 24px;
+  background: linear-gradient(135deg, #e8f5e9, #ffffff);
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ===== Heading ===== */
+.plantation-form h3 {
+  text-align: center;
+  color: #2e7d32;
+  margin-bottom: 16px;
+}
+
+/* ===== Messages ===== */
+.plantation-form p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.plantation-form .success {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.plantation-form .error {
+  color: #c62828;
+}
+
+/* ===== Form ===== */
+.plantation-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== Labels ===== */
+.plantation-form label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+/* ===== Inputs & Select ===== */
+.plantation-form input,
+.plantation-form select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.plantation-form input:focus,
+.plantation-form select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+/* ===== CO2 Display ===== */
+.plantation-form .total-co2 {
+  margin-top: 8px;
+  padding: 10px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1b5e20;
+  text-align: center;
+}
+
+/* ===== Buttons ===== */
+.plantation-form button {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+}
+
+/* Add Plot Button */
+.plantation-form button[type="submit"] {
+  background: linear-gradient(135deg, #43a047, #2e7d32);
+  color: white;
+}
+
+.plantation-form button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(67, 160, 71, 0.3);
+}
+
+/* Reset Button */
+.plantation-form button[type="button"] {
+  background: #eeeeee;
+  color: #333;
+}
+
+.plantation-form button[type="button"]:hover {
+  background: #e0e0e0;
+}
+
+/* Disabled */
+.plantation-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 480px) {
+  .plantation-form {
+    padding: 18px;
+  }
+}
