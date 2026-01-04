@@ -1,0 +1,113 @@
+/* ================= ROOT ================= */
+
+body {
+  margin: 0;
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+/* ================= CONTAINER ================= */
+
+.leaderboard-container {
+  min-height: 100vh;
+  padding: 40px;
+  
+  background-size:cover;
+  background-position: center;
+  color: #f6fbf5;
+}
+
+/* ================= TITLE ================= */
+
+.leaderboard-title {
+  text-align: center;
+  font-size: 34px;
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+  color: #ffffff;
+}
+
+/* ================= GRID ================= */
+
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+/* ================= CARD ================= */
+
+.leaderboard-card {
+  border: 2px solid #ffffff;
+  padding: 20px;
+  background-color: rgba(30, 55, 15, 0.9);
+}
+
+/* ================= SECTION TITLE ================= */
+
+.section-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ffffff;
+  padding-bottom: 8px;
+  text-transform: uppercase;
+}
+
+/* ================= TABLE ================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+thead {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+th,
+td {
+  border: 1px solid #ffffff;
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+th {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* ================= ROW EFFECT ================= */
+
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ================= BADGES ================= */
+
+td span {
+  font-size: 18px;
+}
+
+/* ================= IMAGE ================= */
+
+td img {
+  border-radius: 6px;
+  border: 1px solid #ffffff;
+}
+
+/* ================= INFO TEXT ================= */
+
+.info-text {
+  font-size: 12px;
+  color: #dddddd;
+  margin-top: 12px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+  .leaderboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

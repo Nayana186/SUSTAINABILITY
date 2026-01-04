@@ -86,7 +86,10 @@ export default function Redeem() {
   const isAdmin = ADMIN_EMAILS.includes(user?.email);
 
   return (
-    <div className="redeem-page">
+    <div
+     className="redeem-page"
+     style={{ backgroundImage: "url(/forest.jpg)" }}
+     >
       <div className="redeem-card">
         <h1>Redeem Credits</h1>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
+import "./leaderboard.css";
 
 /* ================= CONFIG ================= */
 
@@ -72,12 +73,13 @@ export default function Leaderboard() {
           const trustWeight = trustWeights[tree.trustLevel] ?? 0.6;
           const locationWeight = getLocationWeight(tree);
 
-          const weightedCO2 = (tree.totalCO2TillNow || 0) * confidenceWeight * trustWeight * locationWeight;
+          const weightedCO2 =
+            (tree.totalCO2TillNow || 0) *
+            confidenceWeight *
+            trustWeight *
+            locationWeight;
 
-          return {
-            ...tree,
-            weightedCO2,
-          };
+          return { ...tree, weightedCO2 };
         });
 
         /* ================= TREE LEADERBOARD ================= */
@@ -110,7 +112,7 @@ export default function Leaderboard() {
           userMap[tree.userId].treeCount += 1;
         });
 
-        let users = Object.values(userMap)
+        const users = Object.values(userMap)
           .map((user) => ({
             ...user,
             credits: Math.floor(user.verifiedCO2 / CREDIT_THRESHOLD),
@@ -137,98 +139,112 @@ export default function Leaderboard() {
     fetchLeaderboard();
   }, []);
 
-  if (loading) return <p>Loading leaderboard...</p>;
+  if (loading) {
+    return (
+      <div className="leaderboard-container"
+      style={{ backgroundImage: "url(/forest.jpg)" }}>
+        <h2>Loading leaderboard...</h2>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: 30, maxWidth: 900 }}>
-      <h1>🏆 CQuester Leaderboard</h1>
+    <div className="leaderboard-container"
+    style={{ backgroundImage: "url(/forest.jpg)" }}
+    >
+      {/* ================= TITLE ================= */}
+      <h1 className="leaderboard-title">CQUESTER LEADERBOARD</h1>
 
-      {/* ================= USER LEADERBOARD ================= */}
+      {/* ================= GRID ================= */}
+      <div className="leaderboard-grid">
+        {/* ================= USER LEADERBOARD ================= */}
+        <div className="leaderboard-card">
+          <h2 className="section-title">TOP CONTRIBUTORS</h2>
 
-      <h2 style={{ marginTop: 30 }}>👤 Top Contributors</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>CO₂ (kg)</th>
+                <th>Verified CO₂</th>
+                <th>Credits</th>
+                <th>Badges</th>
+              </tr>
+            </thead>
+            <tbody>
+              {userLeaderboard.map((user, index) => (
+                <tr key={user.userId}>
+                  <td>{index + 1}</td>
+                  <td>{user.email}</td>
+                  <td>{user.rawCO2.toFixed(1)}</td>
+                  <td>{user.verifiedCO2.toFixed(1)}</td>
+                  <td>{user.credits}</td>
+                  <td>
+                    {user.badges.map((b) => (
+                      <span key={b}>{badgeIcons[b]}</span>
+                    ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      <table width="100%" border="1" cellPadding="10">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>User</th>
-            <th>Total CO₂ (kg)</th>
-            <th>Verified CO₂ (kg)</th>
-            <th>Credits</th>
-            <th>Badges</th>
-          </tr>
-        </thead>
-        <tbody>
-          {userLeaderboard.map((user, index) => (
-            <tr key={user.userId}>
-              <td>{index + 1}</td>
-              <td>{user.email}</td>
-              <td>{user.rawCO2.toFixed(1)}</td>
-              <td>{user.verifiedCO2.toFixed(1)}</td>
-              <td>{user.credits}</td>
-              <td>
-                {user.badges.map((b) => (
-                  <span key={b} style={{ marginRight: 6 }}>
-                    {badgeIcons[b]}
-                  </span>
-                ))}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <p className="info-text">
+            ℹ️ Credits are weighted by confidence, trust & GPS accuracy.  
+            1 credit = 1000 kg CO₂ (informational).
+          </p>
+        </div>
 
-      <p style={{ marginTop: 10, fontSize: 12, color: "#555" }}>
-        ℹ️ Credits are weighted by confidence, trust, and GPS location accuracy.
-        1 credit = 1000 kg CO₂ (informational, not certified).
-      </p>
+        {/* ================= TREE LEADERBOARD ================= */}
+        <div
+         className="leaderboard-card"
+        >
+          <h2 className="section-title">TOP TREES BY VERIFIED CO₂</h2>
 
-      <hr style={{ margin: "40px 0" }} />
-
-      {/* ================= TREE LEADERBOARD ================= */}
-
-      <h2>🌳 Top Trees by Verified CO₂</h2>
-
-      <table width="100%" border="1" cellPadding="10">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Species</th>
-            <th>Age</th>
-            <th>Confidence</th>
-            <th>Trust</th>
-            <th>Location</th>
-            <th>Verified CO₂ (kg)</th>
-            <th>Image</th>
-          </tr>
-        </thead>
-        <tbody>
-          {treeLeaderboard.map((tree, index) => (
-            <tr key={tree.id}>
-              <td>{index + 1}</td>
-              <td>{tree.species}</td>
-              <td>{tree.age}</td>
-              <td>{tree.confidence}</td>
-              <td>{tree.trustLevel}</td>
-              <td>
-                {tree.location ? `📍 ${Math.round(tree.location.accuracy)}m` : "❌"}
-              </td>
-              <td>{tree.weightedCO2.toFixed(1)}</td>
-              <td>
-                {tree.imageUrl && (
-                  <img
-                    src={tree.imageUrl}
-                    alt={tree.species}
-                    width={50}
-                    height={50}
-                    style={{ borderRadius: 6 }}
-                  />
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Species</th>
+                <th>Age</th>
+                <th>Confidence</th>
+                <th>Trust</th>
+                <th>Location</th>
+                <th>CO₂</th>
+                <th>Image</th>
+              </tr>
+            </thead>
+            <tbody>
+              {treeLeaderboard.map((tree, index) => (
+                <tr key={tree.id}>
+                  <td>{index + 1}</td>
+                  <td>{tree.species}</td>
+                  <td>{tree.age}</td>
+                  <td>{tree.confidence}</td>
+                  <td>{tree.trustLevel}</td>
+                  <td>
+                    {tree.location
+                      ? `📍 ${Math.round(tree.location.accuracy)}m`
+                      : "❌"}
+                  </td>
+                  <td>{tree.weightedCO2.toFixed(1)}</td>
+                  <td>
+                    {tree.imageUrl && (
+                      <img
+                        src={tree.imageUrl}
+                        alt={tree.species}
+                        width={50}
+                        height={50}
+                      />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
